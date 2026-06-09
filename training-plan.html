@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#14181d">
+<title>Training Plan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#14181d; --surface:#1b2128; --surface-2:#222a32;
+    --text:#eef1f3; --muted:#8b96a2; --faint:#5c6671;
+    --accent:#f2a93b; --accent-dim:rgba(242,169,59,.13);
+    --line:rgba(255,255,255,.07);
+    --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+    --sans:"Space Grotesk",system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    background:var(--bg); color:var(--text); font-family:var(--sans);
+    line-height:1.45; padding:0 18px 64px;
+    max-width:640px; margin:0 auto;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  /* Header */
+  header{padding:30px 0 14px}
+  .eyebrow{
+    font-family:var(--mono); font-size:11px; font-weight:700;
+    letter-spacing:.22em; text-transform:uppercase; color:var(--accent);
+  }
+  h1{font-size:30px; font-weight:700; letter-spacing:-.02em; margin-top:6px}
+  .sub{color:var(--muted); font-size:14px; margin-top:6px}
+
+  /* Ground rules */
+  details.rules{
+    margin-top:18px; background:var(--surface); border:1px solid var(--line);
+    border-radius:14px; overflow:hidden;
+  }
+  details.rules summary{
+    cursor:pointer; list-style:none; padding:14px 16px;
+    font-size:13px; font-weight:600; color:var(--text);
+    display:flex; align-items:center; gap:8px; user-select:none;
+  }
+  details.rules summary::-webkit-details-marker{display:none}
+  .dot{width:7px;height:7px;border-radius:50%;background:var(--accent);flex:none}
+  details.rules summary .chev{margin-left:auto;color:var(--faint);font-family:var(--mono);transition:transform .2s}
+  details.rules[open] summary .chev{transform:rotate(90deg)}
+  details.rules ul{list-style:none;padding:0 16px 16px;margin-top:-2px}
+  details.rules li{
+    color:var(--muted); font-size:13.5px; padding:7px 0 7px 18px;
+    position:relative; border-top:1px solid var(--line);
+  }
+  details.rules li:first-child{border-top:none}
+  details.rules li::before{content:"–";position:absolute;left:0;color:var(--accent)}
+
+  /* Week strip */
+  .week{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-top:18px}
+  .week .d{
+    background:var(--surface);border:1px solid var(--line);border-radius:9px;
+    padding:8px 2px;text-align:center;
+  }
+  .week .d .lbl{font-family:var(--mono);font-size:9.5px;color:var(--faint);letter-spacing:.05em}
+  .week .d .v{font-family:var(--mono);font-size:13px;font-weight:700;margin-top:3px}
+  .week .d.a .v{color:var(--accent)}
+  .week .d.b .v{color:#7fc4e8}
+  .week .d.x .v{color:var(--faint)}
+
+  /* Tabs */
+  nav.tabs{
+    position:sticky; top:0; z-index:5; background:var(--bg);
+    padding:14px 0 12px; margin-top:8px;
+  }
+  .tabs .seg{
+    display:grid;grid-template-columns:repeat(3,1fr);gap:4px;
+    background:var(--surface);border:1px solid var(--line);
+    border-radius:13px;padding:4px;
+  }
+  .tabs button{
+    font-family:var(--sans);font-size:13.5px;font-weight:600;color:var(--muted);
+    background:transparent;border:none;border-radius:9px;padding:10px 4px;cursor:pointer;
+    transition:background .18s,color .18s;
+  }
+  .tabs button.active{background:var(--accent);color:#1a1206}
+  .tabs button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+  /* Panels */
+  .panel{display:none}
+  .panel.show{display:block;animation:fade .22s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+  .meta{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint);margin:6px 0 14px}
+
+  .group-label{
+    font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--accent);margin:22px 0 8px;
+  }
+
+  /* Exercise rows */
+  .ex{
+    display:flex;gap:13px;align-items:baseline;
+    padding:13px 0;border-top:1px solid var(--line);
+  }
+  .ex:first-of-type{border-top:none}
+  .num{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--faint);min-width:18px;padding-top:2px}
+  .body{flex:1;min-width:0}
+  .name{font-size:15.5px;font-weight:600;letter-spacing:-.01em}
+  .cue{font-size:12px;color:var(--accent);margin-top:2px}
+  .swap{font-size:12.5px;color:var(--muted);margin-top:4px}
+  .swap b{color:var(--faint);font-weight:500}
+  .reps{
+    font-family:var(--mono);font-size:14px;font-weight:700;color:var(--accent);
+    white-space:nowrap;background:var(--accent-dim);padding:4px 9px;border-radius:7px;
+  }
+
+  footer{margin-top:36px;padding-top:16px;border-top:1px solid var(--line);
+    font-size:12px;color:var(--faint);line-height:1.6}
+
+  @media (prefers-reduced-motion:reduce){
+    .panel.show{animation:none}
+    *{transition:none!important}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="eyebrow">Strength &amp; Conditioning</div>
+  <h1>Training Plan</h1>
+  <div class="sub">3 lifting days · 3 easy cardio/accessory days · 1 rest. Tap today's session.</div>
+
+  <details class="rules">
+    <summary><span class="dot"></span> Ground rules <span class="chev">›</span></summary>
+    <ul>
+      <li>Exhale on the effort — never hold your breath under load.</li>
+      <li>Leave 2–3 reps in reserve. Don't train to failure (especially pull-ups).</li>
+      <li>Warm up and cool down gradually; stand up slowly between sets.</li>
+      <li>Stop and sit down if your heart races/skips, or you feel dizzy or breathless.</li>
+      <li>Keep cardio easy and conversational — no intervals.</li>
+      <li>No stimulant pre-workouts.</li>
+    </ul>
+  </details>
+
+  <div class="week" aria-label="Weekly rotation">
+    <div class="d a"><div class="lbl">DAY 1</div><div class="v">A</div></div>
+    <div class="d"><div class="lbl">DAY 2</div><div class="v" style="color:var(--muted)">Acc</div></div>
+    <div class="d b"><div class="lbl">DAY 3</div><div class="v">B</div></div>
+    <div class="d"><div class="lbl">DAY 4</div><div class="v" style="color:var(--muted)">Acc</div></div>
+    <div class="d a"><div class="lbl">DAY 5</div><div class="v">A</div></div>
+    <div class="d"><div class="lbl">DAY 6</div><div class="v" style="color:var(--muted)">Acc</div></div>
+    <div class="d x"><div class="lbl">DAY 7</div><div class="v">Rest</div></div>
+  </div>
+</header>
+
+<nav class="tabs">
+  <div class="seg" role="tablist">
+    <button class="active" role="tab" aria-selected="true" data-tab="A">Lift A</button>
+    <button role="tab" aria-selected="false" data-tab="B">Lift B</button>
+    <button role="tab" aria-selected="false" data-tab="ACC">Accessory</button>
+  </div>
+</nav>
+
+<!-- LIFT A -->
+<section class="panel show" id="A" role="tabpanel">
+  <div class="meta">Push + Legs · warm up 5 min easy cardio</div>
+
+  <div class="ex"><div class="num">01</div><div class="body">
+    <div class="name">Leg press</div>
+    <div class="swap"><b>swap:</b> hack squat · goblet squat · leg extension</div>
+  </div><div class="reps">3 × 10–15</div></div>
+
+  <div class="ex"><div class="num">02</div><div class="body">
+    <div class="name">Push-ups</div>
+    <div class="swap"><b>swap:</b> machine chest press · DB bench · incline push-ups</div>
+  </div><div class="reps">3 × 8–15</div></div>
+
+  <div class="ex"><div class="num">03</div><div class="body">
+    <div class="name">Seated shoulder press</div>
+    <div class="swap"><b>swap:</b> DB press · Arnold press · machine press</div>
+  </div><div class="reps">2–3 × 10–12</div></div>
+
+  <div class="ex"><div class="num">04</div><div class="body">
+    <div class="name">Lateral raise</div>
+    <div class="swap"><b>swap:</b> cable · machine lateral raise</div>
+  </div><div class="reps">2 × 12–15</div></div>
+
+  <div class="ex"><div class="num">05</div><div class="body">
+    <div class="name">Triceps pushdown</div>
+    <div class="swap"><b>swap:</b> overhead extension · bench dips · close-grip push-ups</div>
+  </div><div class="reps">2–3 × 10–15</div></div>
+
+  <div class="ex"><div class="num">06</div><div class="body">
+    <div class="name">Leg curl</div>
+    <div class="swap"><b>swap:</b> seated/lying leg curl · light RDL</div>
+  </div><div class="reps">2 × 12–15</div></div>
+
+  <div class="ex"><div class="num">07</div><div class="body">
+    <div class="name">Calf raise</div>
+    <div class="cue">Full range · pause at the stretch · squeeze at top</div>
+    <div class="swap"><b>swap:</b> standing · seated · leg-press · single-leg</div>
+  </div><div class="reps">3 × 12–20</div></div>
+</section>
+
+<!-- LIFT B -->
+<section class="panel" id="B" role="tabpanel">
+  <div class="meta">Pull + Legs · warm up 5 min easy cardio</div>
+
+  <div class="ex"><div class="num">01</div><div class="body">
+    <div class="name">Goblet squat / leg press</div>
+    <div class="swap"><b>swap:</b> hack squat · walking lunges · Smith squat</div>
+  </div><div class="reps">3 × 10–12</div></div>
+
+  <div class="ex"><div class="num">02</div><div class="body">
+    <div class="name">Seated cable row</div>
+    <div class="swap"><b>swap:</b> chest-supported row · 1-arm DB row · lat pulldown</div>
+  </div><div class="reps">2–3 × 10–12</div></div>
+
+  <div class="ex"><div class="num">03</div><div class="body">
+    <div class="name">Hip thrust <span style="color:var(--muted);font-weight:500">or RDL (rotate)</span></div>
+    <div class="cue">RDL: hinge from hips · flat back · exhale up</div>
+    <div class="swap"><b>swap:</b> glute bridge · cable pull-through · back extension</div>
+  </div><div class="reps">3 × 10–12</div></div>
+
+  <div class="ex"><div class="num">04</div><div class="body">
+    <div class="name">Face pulls</div>
+    <div class="swap"><b>swap:</b> reverse pec-deck · band pull-aparts · rear-delt fly</div>
+  </div><div class="reps">2–3 × 15–20</div></div>
+
+  <div class="ex"><div class="num">05</div><div class="body">
+    <div class="name">Biceps curls</div>
+    <div class="swap"><b>swap:</b> hammer · barbell · preacher curls</div>
+  </div><div class="reps">3 × 10–15</div></div>
+
+  <div class="ex"><div class="num">06</div><div class="body">
+    <div class="name">Shrugs</div>
+    <div class="swap"><b>swap:</b> DB · barbell · cable · machine</div>
+  </div><div class="reps">3 × 12–15</div></div>
+
+  <div class="ex"><div class="num">07</div><div class="body">
+    <div class="name">Calf raise</div>
+    <div class="cue">Full range · pause at the stretch · squeeze at top</div>
+    <div class="swap"><b>swap:</b> standing · seated · leg-press · single-leg</div>
+  </div><div class="reps">3 × 12–20</div></div>
+</section>
+
+<!-- ACCESSORY -->
+<section class="panel" id="ACC" role="tabpanel">
+  <div class="meta">Cardio + abs + arms · keep it light</div>
+
+  <div class="group-label">Cardio</div>
+  <div class="ex"><div class="num">01</div><div class="body">
+    <div class="name">Steady cardio</div>
+    <div class="swap"><b>swap:</b> incline walk · bike · elliptical · easy rower</div>
+  </div><div class="reps">30 min</div></div>
+
+  <div class="group-label">Pull-ups → build to 10</div>
+  <div class="ex"><div class="num">02</div><div class="body">
+    <div class="name">Pull-ups</div>
+    <div class="cue">2 reps short of failure · add negatives/bands for volume</div>
+    <div class="swap"><b>swap:</b> assisted machine · bands · lat pulldown · negatives</div>
+  </div><div class="reps">4–5 sets</div></div>
+
+  <div class="group-label">Abs</div>
+  <div class="ex"><div class="num">03</div><div class="body">
+    <div class="name">Hanging leg raise</div>
+    <div class="swap"><b>swap:</b> captain's chair · lying leg raise · reverse crunch</div>
+  </div><div class="reps">3 × 8–12</div></div>
+  <div class="ex"><div class="num">04</div><div class="body">
+    <div class="name">Weighted cable crunch</div>
+    <div class="swap"><b>swap:</b> machine crunch · weighted decline crunch</div>
+  </div><div class="reps">3 × 12–15</div></div>
+  <div class="ex"><div class="num">05</div><div class="body">
+    <div class="name">Bicycle / Russian twist</div>
+  </div><div class="reps">2–3 × 15–20</div></div>
+  <div class="ex"><div class="num">06</div><div class="body">
+    <div class="name">Plank</div>
+    <div class="swap"><b>swap:</b> side plank · ab wheel</div>
+  </div><div class="reps">2 × 30–45s</div></div>
+
+  <div class="group-label">Forearms / grip</div>
+  <div class="ex"><div class="num">07</div><div class="body">
+    <div class="name">Wrist curls</div>
+  </div><div class="reps">2–3 × 12–15</div></div>
+  <div class="ex"><div class="num">08</div><div class="body">
+    <div class="name">Reverse wrist curls</div>
+  </div><div class="reps">2 × 12–15</div></div>
+  <div class="ex"><div class="num">09</div><div class="body">
+    <div class="name">Farmer's hold</div>
+  </div><div class="reps">2 × 20–30s</div></div>
+</section>
+
+<footer>
+  Progress: hit the top of the rep range on all sets with reps in reserve → add the smallest weight next time.<br>
+  Not medical advice — confirm your training intensity with your doctor.
+</footer>
+
+<script>
+  const buttons = document.querySelectorAll('.tabs button');
+  const panels = document.querySelectorAll('.panel');
+  buttons.forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      buttons.forEach(b=>{b.classList.remove('active');b.setAttribute('aria-selected','false')});
+      btn.classList.add('active');btn.setAttribute('aria-selected','true');
+      panels.forEach(p=>p.classList.remove('show'));
+      document.getElementById(btn.dataset.tab).classList.add('show');
+      window.scrollTo({top:0,behavior:'instant' in window?'instant':'auto'});
+    });
+  });
+</script>
+</body>
+</html>
